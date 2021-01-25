@@ -40,6 +40,31 @@ body {
   float: right;
 }
 
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid-item{
+  padding: 50px;
+  background-color: #f1f1f1;
+  text-decoration: none;
+  font-size: 18px; 
+  line-height: 25px;
+  border-radius: 4px;
+  color: rgb(66, 109, 138);
+}
+
+.grid-container a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
 @media screen and (max-width: 500px) {
   .header a {
     float: none;
