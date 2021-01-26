@@ -65,6 +65,24 @@ body {
   color: black;
 }
 
+.contact-container {
+  padding: 10px 30% 10px 30%;
+}
+
+.contain-contacts {
+  height: 10em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #ddd;
+}
+
+.contact-item {
+  padding:  10px;
+  text-decoration: none;
+}
+
 @media screen and (max-width: 500px) {
   .header a {
     float: none;
