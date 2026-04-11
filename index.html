@@ -1,610 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tobias Collier</title>
-
-  <!--
-    - favicon
-  -->
-  <link rel="shortcut icon" href="./assets/images/logo.ico" type="image/x-icon">
-
-  <!--
-    - custom css link
-  -->
-  <link rel="stylesheet" href="./assets/css/style.css">
-
-  <!--
-    - google font lin
-  -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tobias Collier | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="src/ProjectItem.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0a0a0a',
+                        cardbg: '#171717',
+                        peach: '#ffbfa8',
+                        accentpink: '#f472b6',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 10px rgba(244, 114, 182, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth scrolling for anchor links */
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
+<body class="bg-darkbg text-white font-sans antialiased">
 
-<body>
-
-  <!--
-    - #MAIN
-  -->
-
-  <main>
-
-    <!--
-      - #SIDEBAR
-    -->
-
-    <aside class="sidebar" data-sidebar>
-
-      <div class="sidebar-info">
-
-        <figure class="avatar-box">
-          <img src="./assets/images/my-avatar.png" alt="Tobias Collier" width="70">
-        </figure>
-
-        <div class="info-content">
-          <h1 class="name" title="Tobias Collier">Tobias Collier</h1>
-
-          <p class="title">Video editor</p>
+    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-sm border-b border-gray-800 px-4 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="#" class="text-xl font-bold tracking-tighter text-peach">Tobias Collier</a>
+            <div class="space-x-6 text-sm md:text-base">
+                <a href="#about" class="hover:text-accentpink transition-colors">About</a>
+                <a href="#projects" class="hover:text-accentpink transition-colors">Projects</a>
+                <a href="#work" class="hover:text-accentpink transition-colors">Work</a>
+            </div>
         </div>
-
-        <button class="info_more-btn" data-sidebar-btn>
-          <span>Show Contacts</span>
-
-          <ion-icon name="chevron-down"></ion-icon>
-        </button>
-
-      </div>
-
-      <div class="sidebar-info_more">
-
-        <div class="separator"></div>
-
-        <ul class="contacts-list">
-
-          <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="mail-outline"></ion-icon>
-            </div>
-
-            <div class="contact-info">
-              <p class="contact-title">Email</p>
-
-              <a href="mailto:tacollier0@gmail.com" class="contact-link">tacollier0@gmail.com</a>
-            </div>
-
-          </li>
-
-          <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="logo-youtube"></ion-icon>
-            </div>
-
-            <div class="contact-info">
-              <p class="contact-title">Youtube</p>
-              <a href="https://youtube.com/@tobycollier" class="contact-link">@tobycollier</a>
-            </div>
-
-          </li>
-
-          <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="location-outline"></ion-icon>
-            </div>
-
-            <div class="contact-info">
-              <p class="contact-title">Location</p>
-
-              <address>Perth, WA, Australia</address>
-            </div>
-
-          </li>
-
-        </ul>
-
-        <div class="separator"></div>
-
-        <ul class="social-list">
-
-          <li class="social-item">
-            <a href="https://youtube.com/@tobycollier" class="social-link">
-              <ion-icon name="logo-youtube"></ion-icon>
-            </a>
-          </li>
-
-          <li class="social-item">
-            <a href="https://twitter.com/tobblecobble" class="social-link">
-              <ion-icon name="logo-twitter"></ion-icon>
-            </a>
-          </li>
-
-          <li class="social-item">
-            <a href="https://twitch.tv/tobblecobble" class="social-link">
-              <ion-icon name="logo-twitch"></ion-icon>
-            </a>
-          </li>
-
-        </ul>
-
-      </div>
-
-    </aside>
-
-
-
-
-
-    <!--
-      - #main-content
-    -->
-
-    <div class="main-content">
-
-      <!--
-        - #NAVBAR
-      -->
-
-      <nav class="navbar">
-
-        <ul class="navbar-list">
-
-          <li class="navbar-item">
-            <button class="navbar-link  active" data-nav-link>About</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Resume</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Portfolio</button>
-          </li>
-
-          <li class="navbar-item">
-            <a href="mailto:tacollier0@gmail.com" class="navbar-link">Contact</a>
-          </li>
-
-        </ul>
-
-      </nav>
-
-
-
-
-
-      <!--
-        - #ABOUT
-      -->
-
-      <article class="about  active" data-page="about">
-
-        <header>
-          <h2 class="h2 article-title">About me</h2>
-        </header>
-
-        <section class="about-text">
-          <p>
-            I'm a Video Editor and Social Media Manager from Perth, Australia, working in both short form and long form content.
-            I enjoy working on cool and innovative projects that go against the mainstream. 
-          </p>
-
-          <p>
-            My job is to edit your videos so that they're engaging and hook you in but at the same time leave the viewer satisfied
-            and not overwhelmed.
-            Moreover, I add a personal touch and make sure that your videos are easy to digest and not just the same boring content
-            that viewers are used to so that you stick out as someone above the rest. I have built up profiles for companies and individuals
-            both large and small.
-          </p>
-        </section>
-
-
-        <!--
-          - service
-        -->
-
-        <section class="service">
-
-          <h3 class="h3 service-title">What i'm doing</h3>
-
-          <ul class="service-list">
-
-            <li class="service-item">
-
-              <div class="service-icon-box">
-                <img src="./assets/images/icon-design.svg
-                " alt="design icon" width="40">
-              </div>
-
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title">Video Editing</h4>
-
-                <p class="service-item-text">
-                  The most modern and high-quality edits made at a professional level.
-                </p>
-              </div>
-
-            </li>
-
-            <li class="service-item">
-
-              <div class="service-icon-box">
-                <img src="./assets/images/icon-dev.svg" alt="Web development icon" width="40">
-              </div>
-
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title">Video Production</h4>
-
-                <p class="service-item-text">
-                  High-quality production and building up of content.
-                </p>
-              </div>
-
-            </li>
-
-            <li class="service-item">
-
-              <div class="service-icon-box">
-                <img src="./assets/images/icon-app.svg" alt="mobile app icon" width="40">
-              </div>
-
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title">Social Media Management</h4>
-
-                <p class="service-item-text">
-                  Professional handling of how people view you online.
-                </p>
-              </div>
-
-            </li>
-
-          </ul>
-
-        </section>
-
-        <!--
-          - testimonials
-        -->
-
-
-
-        <!--
-          - testimonials modal
-        -->
-
-        <div class="modal-container" data-modal-container>
-
-          <div class="overlay" data-overlay></div>
-
-          <section class="testimonials-modal">
-
-            <button class="modal-close-btn" data-modal-close-btn>
-              <ion-icon name="close-outline"></ion-icon>
-            </button>
-
-            
-
-          </section>
-
-        </div>
-        <!--
-          - clients
-        -->
-
-      </article>
-
-
-      <!--
-        - #RESUME
-      -->
-
-      <article class="resume" data-page="resume">
-
-        <header>
-          <h2 class="h2 article-title">Resume</h2>
-        </header>
-
-        <section class="timeline">
-
-          <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-
-            <h3 class="h3">Education</h3>
-          </div>
-
-          <ol class="timeline-list">
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Robotics Engineering and Computer Science</h4>
-
-              <span>2023 — 2027</span>
-
-              <p class="timeline-text">
-                Learning all about solving problems and designing solutions.
-              </p>
-
-            </li>
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">High School</h4>
-
-              <span>2017 — 2022</span>
-
-              <p class="timeline-text">
-                Studying high-level Math and Science alongside Drama as a creative outlet.
-              </p>
-
-            </li>
-
-          </ol>
-
-        </section>
-
-        <section class="timeline">
-
-          <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-
-            <h3 class="h3">Experience</h3>
-          </div>
-
-          <ol class="timeline-list">
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Social Media Manager</h4>
-
-              <span>2020 — 2023</span>
-
-              <p class="timeline-text">
-                Producing and editing all content for the MythosCraft tiktok page, bringing the brand from 0 to 120,000 followers
-              </p>
-
-            </li>
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Video Editor</h4>
-
-              <span>2023 — 2024</span>
-
-              <p class="timeline-text">
-                Editing episodes for the Time Chasers online game show
-              </p>
-
-            </li>
-
-          </ol>
-
-        </section>
-
-        <section class="skill">
-
-          <h3 class="h3 skills-title">My skills</h3>
-
-          <ul class="skills-list content-card">
-
-            <li class="skills-item">
-
-              <div class="title-wrapper">
-                <h5 class="h5">Premiere Pro</h5>
-                <data value="80">80%</data>
-              </div>
-
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 80%;"></div>
-              </div>
-
-            </li>
-
-            <li class="skills-item">
-
-              <div class="title-wrapper">
-                <h5 class="h5">Motion Graphics</h5>
-                <data value="70">70%</data>
-              </div>
-
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 70%;"></div>
-              </div>
-
-            </li>
-
-            <li class="skills-item">
-
-              <div class="title-wrapper">
-                <h5 class="h5">Branding</h5>
-                <data value="90">90%</data>
-              </div>
-
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 90%;"></div>
-              </div>
-
-            </li>
-
-            <li class="skills-item">
-
-              <div class="title-wrapper">
-                <h5 class="h5">Graphic Design</h5>
-                <data value="50">60%</data>
-              </div>
-
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 60%;"></div>
-              </div>
-
-            </li>
-
-          </ul>
-
-        </section>
-
-      </article>
-
-
-
-
-
-      <!--
-        - #PORTFOLIO
-      -->
-
-      <article class="portfolio" data-page="portfolio">
-
-        <header>
-          <h2 class="h2 article-title">Portfolio</h2>
-        </header>
-
-        <section class="projects">
-
-          <div class="filter-select-box">
-
-            <button class="filter-select" data-select>
-
-              <div class="select-value" data-selecct-value>Select category</div>
-
-              <div class="select-icon">
-                <ion-icon name="chevron-down"></ion-icon>
-              </div>
-
-            </button>
-
-            <ul class="select-list">
-
-              <li class="select-item">
-                <button data-select-item>All</button>
-              </li>
-
-              <li class="select-item">
-                <button data-select-item>Web design</button>
-              </li>
-
-              <li class="select-item">
-                <button data-select-item>Applications</button>
-              </li>
-
-              <li class="select-item">
-                <button data-select-item>Web development</button>
-              </li>
-
-            </ul>
-
-          </div>
-
-          <ul class="project-list">
-
-            <li class="project-item  active" data-filter-item data-category="Social Media Management">
-              <a href="#">
-
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-
-                  <img src="./assets/images/project-1.png" alt="MythosCraft" loading="lazy">
-                </figure>
-
-                <h3 class="project-title">MythosCraft</h3>
-
-                <p class="project-category">Social Media Management</p>
-
-              </a>
-            </li>
-
-            <li class="project-item  active" data-filter-item data-category="Social Media Management">
-              <a href="https://www.youtube.com/watch?v=JTRtEsCw4M8">
-
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-
-                  <img src="./assets/images/onOrbitTrailer.jpg" alt="OnOrbit" loading="lazy">
-                </figure>
-
-                <h3 class="project-title">OnOrbit Trailer</h3>
-
-                <p class="project-category">Full Production</p>
-
-              </a>
-            </li>
-
-            <li class="project-item  active" data-filter-item data-category="Video Editing">
-              <a href="#">
-
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-
-                  <img src="./assets/images/project-3.jpg" alt="InterGTA" loading="lazy">
-                </figure>
-
-                <h3 class="project-title">InterGTA</h3>
-
-                <p class="project-category">Video Editing</p>
-
-              </a>
-            </li>
-
-            <li class="project-item  active" data-filter-item data-category="Social Media Management">
-              <a href="#">
-
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-
-                  <img src="./assets/images/project-4.jpg" alt="BanishedMC" loading="lazy">
-                </figure>
-
-                <h3 class="project-title">BanishedMC</h3>
-
-                <p class="project-category">Social Media Management</p>
-
-              </a>
-            </li>
-
-          </ul>
-
-        </section>
-
-      </article>
-
-      
-
+    </nav>
+
+    <section id="about" class="relative min-h-[60vh] flex items-center justify-center overflow-hidden border-b border-gray-900 bg-darkbg">
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0" style="background-image: radial-gradient(#1a1a1a 1px, transparent 1px); background-size: 40px 40px;"></div>
+        
+        <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" class="opacity-30">
+            <defs>
+                <style>
+                    .blueprint-line {
+                        fill: none;
+                        stroke: #ffbfa8;
+                        stroke-width: 1;
+                        stroke-dasharray: 1000;
+                        stroke-dashoffset: 1000;
+                        animation: draw 8s ease-in-out infinite alternate;
+                    }
+                    .blueprint-accent {
+                        stroke: #f472b6;
+                        stroke-width: 2;
+                    }
+                    @keyframes draw {
+                        to { stroke-dashoffset: 0; }
+                    }
+                    .rotate-slow {
+                        transform-origin: center;
+                        animation: spin 20s linear infinite;
+                    }
+                    @keyframes spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+            </defs>
+
+            <g class="rotate-slow">
+                <circle cx="400" cy="300" r="220" class="blueprint-line opacity-20" />
+                <circle cx="400" cy="300" r="200" class="blueprint-line" stroke-dasharray="10, 10" />
+                
+                <rect x="300" y="200" width="200" height="200" class="blueprint-line blueprint-accent" rx="10" />
+                <path d="M400,100 L400,500 M200,300 L600,300" class="blueprint-line opacity-40" />
+                <circle cx="400" cy="300" r="40" class="blueprint-line blueprint-accent" />
+            </g>
+
+            <text x="20" y="40" fill="#ffbfa8" font-family="monospace" font-size="12" class="opacity-50">X-AXIS: ENABLED</text>
+            <text x="20" y="60" fill="#ffbfa8" font-family="monospace" font-size="12" class="opacity-50">Y-AXIS: ENABLED</text>
+            <text x="20" y="80" fill="#f472b6" font-family="monospace" font-size="12" class="opacity-80">SYS_STATUS: OPTIMIZING...</text>
+        </svg>
     </div>
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+        <div class="inline-block px-3 py-1 mb-6 border border-peach/30 rounded text-[10px] uppercase tracking-[0.3em] text-peach bg-peach/5">
+            Computer Science // Robotics
+        </div>
+        
+        <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-white">
+            Hey, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-peach to-accentpink pr-2">Toby</span>
+        </h1>
+        
+        <p class="text-lg md:text-2xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
+            Automation and Robotics Engineering and Computer Science student at <span class="text-white border-b border-peach/50">UWA</span>. 
+            Designing the intersection of physical systems and intelligent code.
+        </p>
 
-  </main>
+        <div class="mt-12 flex flex-col md:flex-row items-center justify-center gap-6">
+            <a href="#projects" class="px-8 py-3 bg-peach text-darkbg font-bold rounded-full hover:bg-white transition-all transform hover:scale-105">
+                View Projects
+            </a>
+            <a href="#work" class="text-peach border-b border-peach/20 hover:border-peach transition-all pb-1 text-sm font-bold tracking-widest uppercase">
+                Experience
+            </a>
+        </div>
+    </div>
+    </section>
 
+    <section id="skills" class="max-w-6xl mx-auto px-4 py-16">
+        <div class="flex items-center justify-between mb-10">
+            <h2 class="text-3xl font-bold text-peach">Technical Stack</h2>
+            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
+        </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="space-y-4">
+                <h3 class="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Languages</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">C / C++</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">Python</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">Java</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">JavaScript</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">MATLAB</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">C#</span>
+                </div>
+            </div>
 
+            <div class="space-y-4">
+                <h3 class="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Systems & Robotics</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">ROS2</span>
+                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">Arduino</span>
+                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">ESP32</span>
+                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">PID Control</span>
+                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">Embedded Systems</span>
+                </div>
+            </div>
 
+            <div class="space-y-4">
+                <h3 class="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Design & Simulation</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">Autodesk Fusion</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">EasyEDA</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">Git / GitHub</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">LTSpice</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">Quartus</span>
+                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">ModelSim</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section id="projects" class="max-w-6xl mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold mb-8 text-peach">Projects</h2>
 
-  <!--
-    - custom js link
-  -->
-  <script src="./assets/js/script.js"></script>
+        <div class="flex space-x-8 border-b border-gray-800 mb-8 overflow-x-auto">
+            <button onclick="switchTab('robotics')" id="tab-robotics" class="tab-btn pb-4 font-semibold transition-colors border-b-2 text-accentpink border-accentpink">Robotics</button>
+            <button onclick="switchTab('software')" id="tab-software" class="tab-btn pb-4 font-semibold transition-colors border-b-2 border-transparent text-gray-400 hover:text-accentpink">Software</button>
+            <button onclick="switchTab('crafts')" id="tab-crafts" class="tab-btn pb-4 font-semibold transition-colors border-b-2 border-transparent text-gray-400 hover:text-accentpink">Crafts</button>
+        </div>
 
-  <!--
-    - ionicon link
-  -->
-  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        <div class="bg-cardbg border border-gray-800 rounded-lg p-4 md:p-6">
+            <div id="content-robotics" class="tab-content block">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <project-item 
+                        title="Sumo Battle Bot" 
+                        image="src/images/sumoBot.jpg" 
+                        link="src/projects/sumoBot.html">
+                    </project-item>
+                    <project-item 
+                        title="Raspberry Pi Camera" 
+                        image="src/images/camera.jpg" 
+                        link="src/projects/camera.html">
+                    </project-item>
+                    <project-item 
+                        title="Virtual Pet" 
+                        image="src/images/pet.jpg" 
+                        link="src/projects/virtual-pet.html">
+                    </project-item>
+                    <project-item 
+                        title="39th Warman Competition" 
+                        image="src/images/warman.jpg" 
+                        link="src/projects/warman.html">
+                    </project-item>
+                </div>
+            </div>
 
+            <div id="content-software" class="tab-content hidden">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <project-item 
+                        title="MythosCraft" 
+                        image="src/images/mythos.png" 
+                        link="src/projects/mythos.html">
+                    </project-item>
+                    <project-item 
+                        title="Coders For Cause" 
+                        image="src/images/cfc.png" 
+                        link="src/projects/cfc.html">
+                    </project-item>
+                    <project-item 
+                        title="Physics Video Game" 
+                        image="src/images/worm.png" 
+                        link="src/projects/worm.html">
+                    </project-item>
+                </div>
+            </div>
+
+            <div id="content-crafts" class="tab-content hidden">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <project-item 
+                        title="Physics Video Game" 
+                        image="src/images/worm.png" 
+                        link="src/projects/worm.html">
+                    </project-item>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="work" class="max-w-6xl mx-auto px-4 py-16">
+        <div class="flex items-center justify-between mb-10">
+            <h2 class="text-3xl font-bold text-peach">Experience</h2>
+            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
+        </div>
+
+        <div class="space-y-6">
+            
+            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-accentpink/50 transition-colors">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Lab Facilitator</h3>
+                        <p class="text-peach font-medium text-lg">University of Western Australia</p>
+                    </div>
+                    <div class="text-right mt-2 md:mt-0">
+                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-700 text-sm text-gray-400">Feb 2026 - Present</span>
+                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Crawley, WA</p>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="text-accentpink mr-2">▹</span>
+                        <span>Mentoring and assisting students with technical laboratory experiments and coursework within the computer science department.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-peach/50 transition-colors">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Freelance Video Editor</h3>
+                        <p class="text-peach font-medium text-lg">Game Development Industry</p>
+                    </div>
+                    <div class="text-right mt-2 md:mt-0">
+                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-700 text-sm text-gray-400">Oct 2023 - Present</span>
+                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Remote</p>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="text-accentpink mr-2">▹</span>
+                        <span>Collaborating with a variety of game development companies to storyboard, record, and edit high-impact trailers.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-gray-700 transition-colors">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Volunteer Tutor</h3>
+                        <p class="text-peach font-medium text-lg">Teach Learn Grow</p>
+                    </div>
+                    <div class="text-right mt-2 md:mt-0">
+                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-700 text-sm text-gray-400">Nov 2024</span>
+                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Nullagine, WA</p>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="text-accentpink mr-2">▹</span>
+                        <span>Tutored primary students in regional WA, focusing on mathematics, English, and fundamental coding skills.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-accentpink mr-2">▹</span>
+                        <span>Collaborated with educators to develop custom lesson plans to maximize student benefit.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-gray-700 transition-colors">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Bartender</h3>
+                        <p class="text-peach font-medium text-lg">Tradewinds</p>
+                    </div>
+                    <div class="text-right mt-2 md:mt-0">
+                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-800 text-sm text-gray-400">Sep 2023 - Feb 2026</span>
+                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Fremantle, WA</p>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="text-accentpink mr-2">▹</span>
+                        <span>Managed bar operations for corporate and private events, ensuring compliance with RSA and liquor laws.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-accentpink mr-2">▹</span>
+                        <span>Resolved complex customer service situations while maintaining a high standard of professional delivery.</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="education" class="max-w-6xl mx-auto px-4 py-16">
+        <div class="flex items-center justify-between mb-10">
+            <h2 class="text-3xl font-bold text-peach">Education</h2>
+            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
+        </div>
+
+        <div class="relative group">
+            
+            <div class="relative bg-cardbg border border-gray-800 rounded-2xl p-8 md:p-10 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div>
+                        <h3 class="text-2xl md:text-3xl font-black text-white tracking-tight">University of Western Australia</h3>
+                        <p class="text-accentpink font-mono text-sm mt-1 uppercase tracking-[0.2em]">Expected Completion: Nov 2027</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 text-left md:text-right">
+                        <div class="text-4xl font-black text-peach tracking-tighter">6.30 <span class="text-sm font-normal text-gray-500 tracking-normal uppercase">GPA</span></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-800 pt-8">
+                    <div>
+                        <h4 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Primary Degree</h4>
+                        <p class="text-xl text-white font-semibold leading-snug">
+                            Bachelor of Engineering (Honours)
+                        </p>
+                        <p class="text-peach mt-1">Automation and Robotics</p>
+                    </div>
+                    <div>
+                        <h4 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Double Major</h4>
+                        <p class="text-xl text-white font-semibold leading-snug">
+                            Bachelor of Science
+                        </p>
+                        <p class="text-peach mt-1">Computer Science</p>
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-6 border-t border-gray-800/50">
+                    <p class="text-[10px] uppercase tracking-[0.3em] text-gray-600 mb-4">Core Competencies</p>
+                    <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-400 font-mono">
+                        <span>Control Theory</span>
+                        <span>Embedded Systems</span>
+                        <span>Data Structures</span>
+                        <span>Robotic Kinematics</span>
+                        <span>Systems Design</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.replace('block', 'hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('text-accentpink', 'border-accentpink');
+                b.classList.add('text-gray-400', 'border-transparent');
+            });
+
+            document.getElementById('content-' + tabId).classList.replace('hidden', 'block');
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.add('text-accentpink', 'border-accentpink');
+            activeTab.classList.remove('text-gray-400', 'border-transparent');
+        }
+    </script>
+    
+    <footer class="border-t border-gray-900 bg-darkbg py-8 mt-20">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center space-x-4 text-[10px] font-mono tracking-widest uppercase">
+            <div class="flex items-center">
+                <span class="relative flex h-2 w-2 mr-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-peach opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-peach"></span>
+                </span>
+                <span class="text-gray-400">System: </span>
+                <span class="text-white ml-1">Operational</span>
+            </div>
+            <div class="hidden md:block text-gray-800">|</div>
+            <div class="text-gray-400">Lat: <span class="text-white">-32.05</span></div>
+            <div class="text-gray-400">Long: <span class="text-white">115.74</span></div>
+        </div>
+        
+        <p class="text-gray-600 text-xs font-mono tracking-tighter">
+            &copy; 2026 TOBIAS COLLIER
+        </p>
+    </div>
+    </footer>
 </body>
-
 </html>

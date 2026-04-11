@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coders For Cause | Toby</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0a0a0a',
+                        cardbg: '#171717',
+                        peach: '#ffbfa8',
+                        accentpink: '#f472b6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkbg text-white font-sans antialiased">
+
+    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-sm border-b border-gray-800 px-4 py-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <a href="../../index.html" class="text-xl font-bold text-peach">← Back to Portfolio</a>
+            <div class="text-sm text-gray-500 uppercase tracking-widest font-mono">Project Case Study</div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 md:py-20">
+        
+        <header class="mb-12">
+            <h1 class="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter">UWA Game Dev Site</h1> <div class="h-1 w-24 bg-gradient-to-r from-peach to-accentpink rounded-full"></div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            <div class="lg:col-span-2 space-y-12">
+                <section class="prose prose-invert max-w-none">
+                    <h2 class="text-xl font-semibold text-peach mb-4 uppercase tracking-wider">Overview</h2>
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        Working with the Coders For Cause team, I helped build the official website for the UWA Game Development club. This was a collaborative effort involving a large developer pool using an Agile framework.
+                    </p>
+                    <p class="text-gray-300 text-lg leading-relaxed mt-4">
+                        My personal focus was the integration of playable browser games directly into the site, ensuring they performed smoothly and matched the stylistic details of the page design.
+                    </p>
+                </section>
+            </div>
+
+            <div class="space-y-8">
+                <div class="bg-cardbg border border-gray-800 p-6 rounded-2xl">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Technologies Used</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-darkbg border border-peach/30 rounded text-sm text-peach">JavaScript</span>
+                        <span class="px-3 py-1 bg-darkbg border border-peach/30 rounded text-sm text-peach">Tailwind CSS</span>
+                        <span class="px-3 py-1 bg-darkbg border border-peach/30 rounded text-sm text-peach">Agile Workflow</span>
+                    </div>
+                </div>
+
+                <div class="bg-cardbg border border-gray-800 p-6 rounded-2xl">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Key Outcomes</h3>
+                    <ul class="text-sm space-y-3 text-gray-300">
+                        <li class="flex items-start"><span class="text-accentpink mr-2">●</span> Online Game Integration</li>
+                        <li class="flex items-start"><span class="text-accentpink mr-2">●</span> Styled Component Design</li>
+                        <li class="flex items-start"><span class="text-accentpink mr-2">●</span> Agile Team Collaboration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-900 bg-darkbg py-8 mt-20">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center space-x-4 text-[10px] font-mono tracking-widest uppercase">
+            <div class="flex items-center">
+                <span class="relative flex h-2 w-2 mr-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-peach opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-peach"></span>
+                </span>
+                <span class="text-gray-400">System: </span>
+                <span class="text-white ml-1">Operational</span>
+            </div>
+            <div class="hidden md:block text-gray-800">|</div>
+            <div class="text-gray-400">Lat: <span class="text-white">-32.05</span></div>
+            <div class="text-gray-400">Long: <span class="text-white">115.74</span></div>
+        </div>
+        
+        <p class="text-gray-600 text-xs font-mono tracking-tighter">
+            &copy; 2026 TOBIAS COLLIER
+        </p>
+    </div>
+    </footer>
+
+</body>
+</html>
