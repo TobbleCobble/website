@@ -1,467 +1,1120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full w-full overflow-hidden select-none">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tobias Collier | Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tobias Collier | Canvas Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="src/ProjectItem.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        darkbg: '#0a0a0a',
-                        cardbg: '#171717',
+                        darkbg: '#070f0b',
+                        matbg: '#0d2218',
+                        matgrid: '#183a2a',
+                        matline: '#275840',
+                        mattext: '#56a87c',
+                        matgold: '#d4af37',
+                        cardbg: '#141816',
                         peach: '#ffbfa8',
                         accentpink: '#f472b6',
                     },
                     boxShadow: {
-                        'glow': '0 0 10px rgba(244, 114, 182, 0.5)',
+                        'mat-card': '0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
+                        'mat-card-hover': '0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 191, 168, 0.3)',
+                        'glow': '0 0 15px rgba(244, 114, 182, 0.4)',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Smooth scrolling for anchor links */
-        html { scroll-behavior: smooth; }
+        /* Custom Cutting Mat Grid Patterns */
+        .cutting-mat-grid {
+            background-color: #0b1f16;
+            background-image: 
+                /* Sub grid lines (10px) */
+                linear-gradient(to right, rgba(30, 75, 53, 0.35) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(30, 75, 53, 0.35) 1px, transparent 1px),
+                /* Major grid lines (50px) */
+                linear-gradient(to right, rgba(46, 110, 80, 0.6) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(46, 110, 80, 0.6) 1px, transparent 1px),
+                /* Master grid lines (100px) */
+                linear-gradient(to right, rgba(82, 175, 130, 0.75) 1.5px, transparent 1.5px),
+                linear-gradient(to bottom, rgba(82, 175, 130, 0.75) 1.5px, transparent 1.5px);
+            background-size: 
+                10px 10px, 10px 10px,
+                50px 50px, 50px 50px,
+                100px 100px, 100px 100px;
+        }
+
+        /* Tape effect on corners */
+        .tape-corner {
+            position: absolute;
+            width: 70px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            pointer-events: none;
+            z-index: 20;
+        }
+        .tape-tl { top: -10px; left: -20px; transform: rotate(-25deg); }
+        .tape-tr { top: -10px; right: -20px; transform: rotate(25deg); }
+        .tape-bl { bottom: -10px; left: -20px; transform: rotate(15deg); }
+        .tape-br { bottom: -10px; right: -20px; transform: rotate(-15deg); }
+
+        /* Smooth drag transitions */
+        .canvas-world {
+            will-change: transform;
+            transform-origin: 0 0;
+            transition: transform 0.05s ease-out;
+        }
+
+        /* Custom Scrollbars in Modal */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #ffbfa8;
+        }
+
+        /* Card transition effects */
+        .project-card {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, filter 0.25s ease;
+            cursor: grab;
+        }
+        .project-card:active {
+            cursor: grabbing;
+        }
+        .project-card.dimmed {
+            opacity: 0.3;
+            filter: grayscale(80%);
+        }
+        .project-card.highlighted {
+            animation: cardPulse 1.5s infinite alternate;
+        }
+        @keyframes cardPulse {
+            0% { box-shadow: 0 0 10px rgba(255, 191, 168, 0.4); }
+            100% { box-shadow: 0 0 25px rgba(244, 114, 182, 0.8); }
+        }
     </style>
 </head>
-<body class="bg-darkbg text-white font-sans antialiased">
+<body class="bg-darkbg text-white font-sans antialiased h-full w-full overflow-hidden select-none">
 
-    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-sm border-b border-gray-800 px-4 py-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <a href="#" class="text-xl font-bold tracking-tighter text-peach">Tobias Collier</a>
-            <div class="space-x-6 text-sm md:text-base">
-                <a href="#about" class="hover:text-accentpink transition-colors">About</a>
-                <a href="#projects" class="hover:text-accentpink transition-colors">Projects</a>
-                <a href="#work" class="hover:text-accentpink transition-colors">Work</a>
-                <a href="#contact" class="hover:text-accentpink transition-colors">Contact</a>
+    <!-- TOP FIXED HUD NAVIGATION -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-darkbg/85 backdrop-blur-md border-b border-matline/50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Brand & Status -->
+            <div class="flex items-center space-x-3">
+                <div class="w-3 h-3 rounded-full bg-peach animate-ping"></div>
+                <a href="#" onclick="resetView(); return false;" class="group">
+                    <span class="text-lg font-black tracking-wider text-peach group-hover:text-white transition-colors">TOBIAS COLLIER</span>
+                    <span class="text-xs font-mono text-mattext block">WORKSPACE // CUTTING MAT CANVAS</span>
+                </a>
             </div>
+
+            <!-- Quick Jump Targets -->
+            <nav class="hidden md:flex items-center space-x-1 bg-black/40 border border-matline/60 rounded-full p-1 text-xs font-mono">
+                <button onclick="focusTarget('profile')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <span>👤</span> About
+                </button>
+                <button onclick="focusTarget('projects')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <span>⚙️</span> Projects
+                </button>
+                <button onclick="focusTarget('tech')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <span>💻</span> Tech Stack
+                </button>
+                <button onclick="focusTarget('experience')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <span>💼</span> Experience
+                </button>
+                <button onclick="focusTarget('education')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <span>🎓</span> Education
+                </button>
+            </nav>
+
+            <!-- Category Filters -->
+            <div class="flex items-center space-x-2 text-xs font-mono">
+                <span class="hidden sm:inline text-gray-500 uppercase">Filter:</span>
+                <button onclick="filterCategory('all')" id="filter-all" class="filter-btn px-2.5 py-1 rounded border border-peach text-peach bg-peach/10 font-bold transition-all">
+                    ALL
+                </button>
+                <button onclick="filterCategory('robotics')" id="filter-robotics" class="filter-btn px-2.5 py-1 rounded border border-gray-700 text-gray-400 hover:border-mattext hover:text-mattext transition-all">
+                    ROBOTICS
+                </button>
+                <button onclick="filterCategory('software')" id="filter-software" class="filter-btn px-2.5 py-1 rounded border border-gray-700 text-gray-400 hover:border-mattext hover:text-mattext transition-all">
+                    SOFTWARE
+                </button>
+            </div>
+
         </div>
-    </nav>
+    </header>
 
-    <section id="about" class="relative min-h-[60vh] flex items-center justify-center overflow-hidden border-b border-gray-900 bg-darkbg">
-    <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0" style="background-image: radial-gradient(#1a1a1a 1px, transparent 1px); background-size: 40px 40px;"></div>
+    <!-- DRAGGABLE CANVAS CONTAINER -->
+    <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing overflow-hidden relative">
         
-        <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" class="opacity-30">
-            <defs>
-                <style>
-                    .blueprint-line {
-                        fill: none;
-                        stroke: #ffbfa8;
-                        stroke-width: 1;
-                        stroke-dasharray: 1000;
-                        stroke-dashoffset: 1000;
-                        animation: draw 8s ease-in-out infinite alternate;
-                    }
-                    .blueprint-accent {
-                        stroke: #f472b6;
-                        stroke-width: 2;
-                    }
-                    @keyframes draw {
-                        to { stroke-dashoffset: 0; }
-                    }
-                    .rotate-slow {
-                        transform-origin: center;
-                        animation: spin 20s linear infinite;
-                    }
-                    @keyframes spin {
-                        from { transform: rotate(0deg); }
-                        to { transform: rotate(360deg); }
-                    }
-                </style>
-            </defs>
+        <!-- CANVAS WORLD (Transform Target) -->
+        <div id="canvas-world" class="canvas-world cutting-mat-grid absolute w-[2280px] h-[1580px] shadow-2xl rounded-3xl border-4 border-matline/80 relative">
 
-            <g class="rotate-slow">
-                <circle cx="400" cy="300" r="220" class="blueprint-line opacity-20" />
-                <circle cx="400" cy="300" r="200" class="blueprint-line" stroke-dasharray="10, 10" />
+            <!-- CUTTING MAT MEASUREMENT RULERS & BRANDING -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" xmlns="http://www.w3.org/2000/svg">
+                <!-- Border Rulers -->
+                <rect x="20" y="20" width="2240" height="1540" fill="none" stroke="#52af82" stroke-width="2" stroke-dasharray="10, 5" />
                 
-                <rect x="300" y="200" width="200" height="200" class="blueprint-line blueprint-accent" rx="10" />
-                <path d="M400,100 L400,500 M200,300 L600,300" class="blueprint-line opacity-40" />
-                <circle cx="400" cy="300" r="40" class="blueprint-line blueprint-accent" />
-            </g>
+                <!-- Angle Guidelines -->
+                <line x1="20" y1="20" x2="800" y2="800" stroke="#d4af37" stroke-width="1" stroke-dasharray="8, 4" />
+                <text x="320" y="300" fill="#d4af37" font-family="monospace" font-size="14" transform="rotate(45 320 300)">45° ANGLE GUIDE</text>
+                
+                <line x1="2260" y1="20" x2="1480" y2="800" stroke="#d4af37" stroke-width="1" stroke-dasharray="8, 4" />
+                <text x="1820" y="300" fill="#d4af37" font-family="monospace" font-size="14" transform="rotate(-45 1820 300)">45° ANGLE GUIDE</text>
 
-            <text x="20" y="40" fill="#ffbfa8" font-family="monospace" font-size="12" class="opacity-50">X-AXIS: ENABLED</text>
-            <text x="20" y="60" fill="#ffbfa8" font-family="monospace" font-size="12" class="opacity-50">Y-AXIS: ENABLED</text>
-            <text x="20" y="80" fill="#f472b6" font-family="monospace" font-size="12" class="opacity-80">SYS_STATUS: OPTIMIZING...</text>
-        </svg>
-    </div>
-    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <div class="inline-block px-3 py-1 mb-6 border border-peach/30 rounded text-[10px] uppercase tracking-[0.3em] text-peach bg-peach/5">
-            Computer Science // Robotics
-        </div>
-        
-        <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tighter text-white">
-            Hey, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-peach to-accentpink pr-2">Toby</span>
-        </h1>
-        
-        <p class="text-lg md:text-2xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-            Automation and Robotics Engineering and Computer Science student at <span class="text-white border-b border-peach/50">UWA</span>. 
-            Designing the intersection of physical systems and intelligent code.
-        </p>
+                <!-- Center Blueprint Concentric Circles -->
+                <circle cx="1140" cy="795" r="150" fill="none" stroke="#275840" stroke-width="2" />
+                <circle cx="1140" cy="795" r="300" fill="none" stroke="#275840" stroke-width="1.5" stroke-dasharray="10, 10" />
+                <circle cx="1140" cy="795" r="500" fill="none" stroke="#275840" stroke-width="1" />
+                <line x1="1140" y1="60" x2="1140" y2="1520" stroke="#275840" stroke-width="1" stroke-dasharray="5, 5" />
+                <line x1="60" y1="795" x2="2220" y2="795" stroke="#275840" stroke-width="1" stroke-dasharray="5, 5" />
+            </svg>
 
-        <div class="mt-12 flex flex-col md:flex-row items-center justify-center gap-6">
-            <a href="#projects" class="px-8 py-3 bg-peach text-darkbg font-bold rounded-full hover:bg-white transition-all transform hover:scale-105">
-                View Projects
-            </a>
-            <a href="#work" class="text-peach border-b border-peach/20 hover:border-peach transition-all pb-1 text-sm font-bold tracking-widest uppercase">
-                Experience
-            </a>
-        </div>
-    </div>
-    </section>
-
-    <section id="skills" class="max-w-6xl mx-auto px-4 py-16">
-        <div class="flex items-center justify-between mb-10">
-            <h2 class="text-3xl font-bold text-peach">Technical Stack</h2>
-            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="space-y-4">
-                <h3 class="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Languages</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">C / C++</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">Python</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">Java</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">JavaScript</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">MATLAB</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-peach hover:border-accentpink transition-colors">C#</span>
-                </div>
+            <!-- MAT TECHNICAL MARKINGS (Text Graphics) -->
+            <div class="absolute top-8 left-12 font-mono text-mattext/60 text-xs tracking-widest pointer-events-none">
+                <div>SAFETY RULE: ALWAYS USE SELF-HEALING MAT FOR CUTTING & ASSEMBLY</div>
+                <div class="text-[10px] text-matgold/50">MODEL: TC-2026-ROBOTICS // SIZE: 90" x 60" (2280 x 1580 MM)</div>
             </div>
 
-            <div class="space-y-4">
-                <h3 class="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Systems & Robotics</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">ROS2</span>
-                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">Arduino</span>
-                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">ESP32</span>
-                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">PID Control</span>
-                    <span class="px-3 py-1 bg-cardbg border border-accentpink/30 rounded text-sm text-white hover:border-accentpink transition-colors">Embedded Systems</span>
-                </div>
+            <div class="absolute bottom-8 left-12 font-mono text-mattext/60 text-xs tracking-widest pointer-events-none">
+                <div>TOBIAS COLLIER • AUTOMATION & ROBOTICS / COMPUTER SCIENCE</div>
+                <div class="text-[10px] text-gray-500">UNIVERSITY OF WESTERN AUSTRALIA • PERTH, WA</div>
             </div>
 
-            <div class="space-y-4">
-                <h3 class="text-xs uppercase tracking-[0.2em] text-gray-500 font-bold">Design & Simulation</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">Autodesk Fusion</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">EasyEDA</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">Git / GitHub</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">LTSpice</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">Quartus</span>
-                    <span class="px-3 py-1 bg-cardbg border border-gray-800 rounded text-sm text-gray-300 hover:border-peach transition-colors">ModelSim</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="projects" class="max-w-6xl mx-auto px-4 py-16">
-        <h2 class="text-3xl font-bold mb-8 text-peach">Projects</h2>
-
-        <div class="flex space-x-8 border-b border-gray-800 mb-8 overflow-x-auto">
-            <button onclick="switchTab('robotics')" id="tab-robotics" class="tab-btn pb-4 font-semibold transition-colors border-b-2 text-accentpink border-accentpink">Robotics</button>
-            <button onclick="switchTab('software')" id="tab-software" class="tab-btn pb-4 font-semibold transition-colors border-b-2 border-transparent text-gray-400 hover:text-accentpink">Software</button>
-            <button onclick="switchTab('crafts')" id="tab-crafts" class="tab-btn pb-4 font-semibold transition-colors border-b-2 border-transparent text-gray-400 hover:text-accentpink">Crafts</button>
-        </div>
-
-        <div class="bg-cardbg border border-gray-800 rounded-lg p-4 md:p-6">
-            <div id="content-robotics" class="tab-content block">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <project-item 
-                        title="Sumo Battle Bot" 
-                        image="src/images/sumoBot.jpg" 
-                        link="src/projects/sumo/">
-                    </project-item>
-                    <project-item 
-                        title="Raspberry Pi Camera" 
-                        image="src/images/camera.jpg" 
-                        link="src/projects/camera">
-                    </project-item>
-                    <project-item 
-                        title="Virtual Pet" 
-                        image="src/images/pet.jpg" 
-                        link="src/projects/virtualpet/">
-                    </project-item>
-                    <project-item 
-                        title="39th Warman Competition" 
-                        image="src/images/warman.jpg" 
-                        link="src/projects/warman/">
-                    </project-item>
-                </div>
+            <div class="absolute top-8 right-12 font-mono text-mattext/60 text-xs text-right tracking-widest pointer-events-none">
+                <div>X-AXIS: 0000 - 2280 MM</div>
+                <div>Y-AXIS: 0000 - 1580 MM</div>
+                <div class="text-peach/60">SYS_STATUS: ACTIVE WORKBENCH</div>
             </div>
 
-            <div id="content-software" class="tab-content hidden">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <project-item 
-                        title="MythosCraft" 
-                        image="src/images/mythos.png" 
-                        link="src/projects/mythoscraft/">
-                    </project-item>
-                    <project-item 
-                        title="Coders For Cause" 
-                        image="src/images/cfc.png" 
-                        link="src/projects/cfc/">
-                    </project-item>
-                    <project-item 
-                        title="Physics Video Game" 
-                        image="src/images/worm.png" 
-                        link="src/projects/worm/">
-                    </project-item>
-                </div>
-            </div>
+            <!-- ==================================================== -->
+            <!-- CANVAS CARDS & STATIONS ON THE CUTTING MAT          -->
+            <!-- ==================================================== -->
 
-            <div id="content-crafts" class="tab-content hidden">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <project-item 
-                        title="Physics Video Game" 
-                        image="src/images/worm.png" 
-                        link="src/projects/worm">
-                    </project-item>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="work" class="max-w-6xl mx-auto px-4 py-16">
-        <div class="flex items-center justify-between mb-10">
-            <h2 class="text-3xl font-bold text-peach">Experience</h2>
-            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
-        </div>
-
-        <div class="space-y-6">
+            <!-- ROW 1: TOP STATIONS -->
             
-            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-accentpink/50 transition-colors">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Lab Facilitator</h3>
-                        <p class="text-peach font-medium text-lg">University of Western Australia</p>
+            <!-- 1. PROFILE / ABOUT STATION -->
+            <div id="target-profile" class="project-card absolute w-[420px] bg-cardbg/95 border border-matline rounded-2xl p-6 shadow-mat-card text-white pointer-events-auto"
+                 style="left: 200px; top: 140px; transform: rotate(-1.5deg);">
+                <div class="tape-corner tape-tl"></div>
+                <div class="tape-corner tape-tr"></div>
+                
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-peach to-accentpink flex items-center justify-center font-black text-2xl text-darkbg shadow-md">
+                        TC
                     </div>
-                    <div class="text-right mt-2 md:mt-0">
-                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-700 text-sm text-gray-400">Feb 2026 - Present</span>
-                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Crawley, WA</p>
+                    <div>
+                        <div class="text-[10px] font-mono text-peach uppercase tracking-widest">Engineer Profile</div>
+                        <h1 class="text-2xl font-black text-white tracking-tight">Tobias Collier</h1>
+                        <p class="text-xs text-gray-400 font-mono">UWA Robotics & CS Student</p>
                     </div>
                 </div>
-                <ul class="space-y-3 text-gray-300">
-                    <li class="flex items-start">
-                        <span class="text-accentpink mr-2">▹</span>
-                        <span>Mentoring and assisting students with technical laboratory experiments and coursework within the computer science department.</span>
-                    </li>
-                </ul>
+
+                <p class="text-sm text-gray-300 leading-relaxed mb-5">
+                    Automation and Robotics Engineering and Computer Science student at <span class="text-peach font-semibold">UWA</span>. 
+                    Designing the intersection of physical systems and intelligent code.
+                </p>
+
+                <div class="space-y-2 text-xs font-mono text-gray-400 border-t border-gray-800 pt-4 mb-5">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">LOCATION:</span>
+                        <span class="text-white">Perth, WA</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">STATUS:</span>
+                        <span class="text-green-400 font-bold">Seeking 2026/2027 Internships</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">DEGREE GPA:</span>
+                        <span class="text-peach font-bold">6.30 / 7.00</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-800/60">
+                    <a href="assets/TobiasCollierResume.pdf" target="_blank" class="px-4 py-2 bg-peach text-darkbg font-bold rounded-lg text-xs hover:bg-white transition-colors flex items-center gap-1.5">
+                        <span>📄</span> Resume PDF
+                    </a>
+                    <a href="mailto:toby.collier@uwa.edu.au" class="px-3 py-2 bg-darkbg border border-gray-700 text-gray-300 hover:text-peach hover:border-peach rounded-lg text-xs transition-colors">
+                        ✉️ Email
+                    </a>
+                    <a href="https://linkedin.com/in/tobiascollier" target="_blank" class="px-3 py-2 bg-darkbg border border-gray-700 text-gray-300 hover:text-peach hover:border-peach rounded-lg text-xs transition-colors">
+                        🔗 LinkedIn
+                    </a>
+                </div>
             </div>
 
-            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-peach/50 transition-colors">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Freelance Video Editor</h3>
-                        <p class="text-peach font-medium text-lg">Game Development Industry</p>
+            <!-- 2. TECH STACK STATION -->
+            <div id="target-tech" class="project-card absolute w-[440px] bg-cardbg/95 border border-matline rounded-2xl p-6 shadow-mat-card text-white pointer-events-auto"
+                 style="left: 660px; top: 140px; transform: rotate(1deg);">
+                <div class="tape-corner tape-tr"></div>
+                
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">⚡</span>
+                        <h2 class="text-lg font-bold text-peach">Technical Stack</h2>
                     </div>
-                    <div class="text-right mt-2 md:mt-0">
-                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-700 text-sm text-gray-400">Oct 2023 - Present</span>
-                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Remote</p>
+                    <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">SPEC SHEET</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-[11px] font-mono uppercase text-gray-400 mb-2 font-bold">Languages</h3>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-peach">C / C++</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-peach">Python</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-peach">Java</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-peach">JavaScript</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-peach">MATLAB</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-peach">C#</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-[11px] font-mono uppercase text-gray-400 mb-2 font-bold">Systems & Robotics</h3>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2.5 py-1 bg-darkbg border border-accentpink/30 rounded text-xs text-white">ROS2</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-accentpink/30 rounded text-xs text-white">Arduino</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-accentpink/30 rounded text-xs text-white">ESP32</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-accentpink/30 rounded text-xs text-white">PID Control</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-accentpink/30 rounded text-xs text-white">Embedded Systems</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-[11px] font-mono uppercase text-gray-400 mb-2 font-bold">Design & CAD</h3>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-gray-300">Autodesk Fusion</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-gray-300">EasyEDA</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-gray-300">Git / GitHub</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-gray-300">LTSpice</span>
+                            <span class="px-2.5 py-1 bg-darkbg border border-gray-800 rounded text-xs text-gray-300">Quartus</span>
+                        </div>
                     </div>
                 </div>
-                <ul class="space-y-3 text-gray-300">
-                    <li class="flex items-start">
-                        <span class="text-accentpink mr-2">▹</span>
-                        <span>Collaborating with a variety of game development companies to storyboard, record, and edit high-impact trailers.</span>
-                    </li>
-                </ul>
             </div>
 
-            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-gray-700 transition-colors">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Volunteer Tutor</h3>
-                        <p class="text-peach font-medium text-lg">Teach Learn Grow</p>
+            <!-- 3. EXPERIENCE STATION -->
+            <div id="target-experience" class="project-card absolute w-[480px] bg-cardbg/95 border border-matline rounded-2xl p-6 shadow-mat-card text-white pointer-events-auto"
+                 style="left: 1140px; top: 140px; transform: rotate(-1deg);">
+                <div class="tape-corner tape-tl"></div>
+                <div class="tape-corner tape-br"></div>
+
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">💼</span>
+                        <h2 class="text-lg font-bold text-peach">Experience</h2>
                     </div>
-                    <div class="text-right mt-2 md:mt-0">
-                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-700 text-sm text-gray-400">Nov 2024</span>
-                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Nullagine, WA</p>
+                    <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">WORK HISTORY</span>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <!-- Item 1 -->
+                    <div class="border-b border-gray-800/60 pb-3">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-white text-sm">Lab Facilitator</h3>
+                            <span class="text-peach font-mono text-[10px]">Feb 2026 - Present</span>
+                        </div>
+                        <p class="text-gray-400 font-mono text-[11px] mb-1">University of Western Australia</p>
+                        <p class="text-gray-300 leading-snug">Mentoring and assisting students with technical laboratory experiments and coursework in CS & Robotics.</p>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="border-b border-gray-800/60 pb-3">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-white text-sm">Freelance Video Editor</h3>
+                            <span class="text-peach font-mono text-[10px]">Oct 2023 - Present</span>
+                        </div>
+                        <p class="text-gray-400 font-mono text-[11px] mb-1">Game Development Industry</p>
+                        <p class="text-gray-300 leading-snug">Collaborating with game dev studios to storyboard, record, and edit high-impact promotional trailers.</p>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-white text-sm">Volunteer Tutor</h3>
+                            <span class="text-peach font-mono text-[10px]">Nov 2024</span>
+                        </div>
+                        <p class="text-gray-400 font-mono text-[11px] mb-1">Teach Learn Grow (Nullagine, WA)</p>
+                        <p class="text-gray-300 leading-snug">Tutored primary students in regional WA, focusing on mathematics, English, and fundamental coding.</p>
                     </div>
                 </div>
-                <ul class="space-y-3 text-gray-300">
-                    <li class="flex items-start">
-                        <span class="text-accentpink mr-2">▹</span>
-                        <span>Tutored primary students in regional WA, focusing on mathematics, English, and fundamental coding skills.</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-accentpink mr-2">▹</span>
-                        <span>Collaborated with educators to develop custom lesson plans to maximize student benefit.</span>
-                    </li>
-                </ul>
             </div>
 
-            <div class="bg-cardbg border border-gray-800 rounded-xl p-6 md:p-8 hover:border-gray-700 transition-colors">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Bartender</h3>
-                        <p class="text-peach font-medium text-lg">Tradewinds</p>
+            <!-- 4. EDUCATION STATION -->
+            <div id="target-education" class="project-card absolute w-[420px] bg-cardbg/95 border border-matline rounded-2xl p-6 shadow-mat-card text-white pointer-events-auto"
+                 style="left: 1660px; top: 140px; transform: rotate(1.5deg);">
+                <div class="tape-corner tape-tr"></div>
+
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">🎓</span>
+                        <h2 class="text-lg font-bold text-peach">Education</h2>
                     </div>
-                    <div class="text-right mt-2 md:mt-0">
-                        <span class="bg-darkbg px-3 py-1 rounded-full border border-gray-800 text-sm text-gray-400">Sep 2023 - Feb 2026</span>
-                        <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Fremantle, WA</p>
+                    <span class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">ACADEMICS</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <h3 class="text-base font-bold text-white">University of Western Australia</h3>
+                        <p class="text-xs text-accentpink font-mono mt-0.5">Expected Graduation: Nov 2027</p>
+                    </div>
+
+                    <div class="bg-darkbg border border-gray-800 rounded-xl p-3 flex justify-between items-center">
+                        <span class="text-xs font-mono text-gray-400">DEGREE GPA</span>
+                        <span class="text-xl font-black text-peach">6.30 <span class="text-xs text-gray-500 font-normal">/ 7.0</span></span>
+                    </div>
+
+                    <div class="space-y-2 text-xs border-t border-gray-800 pt-3">
+                        <div>
+                            <span class="text-gray-500 text-[10px] uppercase font-mono block">PRIMARY HONOURS DEGREE</span>
+                            <span class="font-semibold text-white">B.E. (Honours) Automation & Robotics</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 text-[10px] uppercase font-mono block">DOUBLE MAJOR</span>
+                            <span class="font-semibold text-white">Bachelor of Science in Computer Science</span>
+                        </div>
                     </div>
                 </div>
-                <ul class="space-y-3 text-gray-300">
-                    <li class="flex items-start">
-                        <span class="text-accentpink mr-2">▹</span>
-                        <span>Managed bar operations for corporate and private events, ensuring compliance with RSA and liquor laws.</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-accentpink mr-2">▹</span>
-                        <span>Resolved complex customer service situations while maintaining a high standard of professional delivery.</span>
-                    </li>
-                </ul>
+            </div>
+
+
+            <!-- ==================================================== -->
+            <!-- ROW 2: PRIMARY ROBOTICS & HARDWARE PROJECTS          -->
+            <!-- ==================================================== -->
+            <div id="target-projects"></div>
+
+            <!-- PROJECT 1: SUMO BATTLE BOT -->
+            <div class="project-card category-robotics absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 360px; top: 600px; transform: rotate(-2deg);"
+                 onclick="openProjectModal('sumo')">
+                <div class="tape-corner tape-tl"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/sumoBot.jpg" alt="Sumo Battle Bot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-peach text-darkbg font-mono font-bold text-[10px]">
+                        2ND PLACE / 50 TEAMS
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        ROBOTICS
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">Sumo Battle Bot</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Autonomous ESP32 competition bot with PID motor synchronization and target acquisition.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">ESP32</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">PID</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Fusion 360</span>
+                </div>
+            </div>
+
+            <!-- PROJECT 2: RASPBERRY PI CAMERA -->
+            <div class="project-card category-robotics absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 750px; top: 600px; transform: rotate(2deg);"
+                 onclick="openProjectModal('camera')">
+                <div class="tape-corner tape-tr"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/camera.jpg" alt="Raspberry Pi Camera" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-accentpink text-darkbg font-mono font-bold text-[10px]">
+                        DUAL MCU
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        EMBEDDED
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">Hybrid Digital Camera</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Raspberry Pi image processing paired with Arduino Nano low-latency viewfinder control.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Raspberry Pi</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Arduino</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Python</span>
+                </div>
+            </div>
+
+            <!-- PROJECT 3: VIRTUAL PET -->
+            <div class="project-card category-robotics absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 1140px; top: 600px; transform: rotate(-1.5deg);"
+                 onclick="openProjectModal('virtualpet')">
+                <div class="tape-corner tape-tl"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/pet.jpg" alt="Virtual Pet" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-peach text-darkbg font-mono font-bold text-[10px]">
+                        STATE MACHINE
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        HARDWARE
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">Arduino Virtual Pet</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Classic 90s Tamagotchi remake with custom OLED bitmap rendering and dynamic mood state machines.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Arduino</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">C++ / OOP</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">OLED</span>
+                </div>
+            </div>
+
+            <!-- PROJECT 4: WARMAN COMPETITION -->
+            <div class="project-card category-robotics absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 1530px; top: 600px; transform: rotate(2.5deg);"
+                 onclick="openProjectModal('warman')">
+                <div class="tape-corner tape-tr"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/warman.jpg" alt="Warman Bot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-accentpink text-darkbg font-mono font-bold text-[10px]">
+                        MECHATRONICS
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        ROBOTICS
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">39th Warman Competition</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Autonomous rock collection robot with custom rack & pinion dual actuators for 1m vertical extension.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Arduino Mega</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Actuators</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">CAD</span>
+                </div>
+            </div>
+
+
+            <!-- ==================================================== -->
+            <!-- ROW 3: SOFTWARE PROJECTS & CONTACT                   -->
+            <!-- ==================================================== -->
+
+            <!-- PROJECT 5: MYTHOSCRAFT -->
+            <div class="project-card category-software absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 360px; top: 1060px; transform: rotate(-1.5deg);"
+                 onclick="openProjectModal('mythos')">
+                <div class="tape-corner tape-tl"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/mythos.png" alt="MythosCraft" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-peach text-darkbg font-mono font-bold text-[10px]">
+                        JAVA FRAMEWORK
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        SOFTWARE
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">MythosCraft Framework</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Modular Java plugin framework engineered with Maven for multi-developer Minecraft server deployments.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Java</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Maven</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">GitHub</span>
+                </div>
+            </div>
+
+            <!-- PROJECT 6: CODERS FOR CAUSE -->
+            <div class="project-card category-software absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 750px; top: 1060px; transform: rotate(1deg);"
+                 onclick="openProjectModal('cfc')">
+                <div class="tape-corner tape-br"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/cfc.png" alt="Coders For Cause" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-accentpink text-darkbg font-mono font-bold text-[10px]">
+                        WEB & GAMES
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        SOFTWARE
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">Coders For Cause (UWA)</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Official UWA Game Dev site built with Agile workflows, featuring browser game embedding.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">JavaScript</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Tailwind</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Agile</span>
+                </div>
+            </div>
+
+            <!-- PROJECT 7: PHYSICS VIDEO GAME -->
+            <div class="project-card category-software absolute w-[350px] bg-cardbg border border-gray-800 hover:border-peach rounded-2xl p-4 shadow-mat-card group cursor-pointer pointer-events-auto"
+                 style="left: 1140px; top: 1060px; transform: rotate(-2deg);"
+                 onclick="openProjectModal('worm')">
+                <div class="tape-corner tape-tr"></div>
+                <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/40 mb-3 border border-gray-800">
+                    <img src="src/images/worm.png" alt="Physics Game" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-peach text-darkbg font-mono font-bold text-[10px]">
+                        FULL RELEASE
+                    </span>
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-peach font-mono text-[10px]">
+                        GAME DEV
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-white group-hover:text-peach transition-colors">Physics Platformer</h3>
+                <p class="text-xs text-gray-400 mt-1 line-clamp-2">Custom physics-based platformer built in Godot, taking original physics math through exhibition and release.</p>
+                <div class="mt-3 flex flex-wrap gap-1">
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Godot</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Physics</span>
+                    <span class="px-2 py-0.5 bg-darkbg border border-gray-800 rounded text-[10px] text-peach">Exhibition</span>
+                </div>
+            </div>
+
+            <!-- WORKBENCH CONTACT CARD -->
+            <div id="target-contact" class="project-card absolute w-[380px] bg-cardbg/95 border border-matline rounded-2xl p-6 shadow-mat-card text-white pointer-events-auto"
+                 style="left: 1530px; top: 1060px; transform: rotate(1.5deg);">
+                <div class="tape-corner tape-tl"></div>
+                <div class="tape-corner tape-br"></div>
+
+                <div class="flex items-center space-x-2 mb-4 border-b border-gray-800 pb-3">
+                    <span class="text-lg">✉️</span>
+                    <h2 class="text-lg font-bold text-peach">Get In Touch</h2>
+                </div>
+
+                <p class="text-xs text-gray-300 leading-relaxed mb-4">
+                    Open for <span class="text-white font-bold">engineering internships & graduate roles</span> for late 2026/2027.
+                </p>
+
+                <div class="space-y-2 text-xs font-mono mb-4">
+                    <a href="mailto:toby.collier@uwa.edu.au" class="flex items-center space-x-3 p-2 bg-darkbg rounded-lg border border-gray-800 hover:border-peach transition-colors text-gray-300 hover:text-white">
+                        <span class="text-peach">📧</span>
+                        <span class="truncate">toby.collier@uwa.edu.au</span>
+                    </a>
+                    <a href="https://linkedin.com/in/tobiascollier" target="_blank" class="flex items-center space-x-3 p-2 bg-darkbg rounded-lg border border-gray-800 hover:border-peach transition-colors text-gray-300 hover:text-white">
+                        <span class="text-peach">🔗</span>
+                        <span class="truncate">linkedin.com/in/tobiascollier</span>
+                    </a>
+                </div>
+
+                <a href="assets/TobiasCollierResume.pdf" target="_blank" class="block w-full py-2.5 bg-peach text-darkbg font-bold rounded-lg text-xs text-center hover:bg-white transition-colors">
+                    Download Full Resume (PDF)
+                </a>
             </div>
 
         </div>
-    </section>
+    </div>
 
-    <section id="education" class="max-w-6xl mx-auto px-4 py-16">
-        <div class="flex items-center justify-between mb-10">
-            <h2 class="text-3xl font-bold text-peach">Education</h2>
-            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
+
+    <!-- FLOATING HUD CONTROLS (Bottom Right) -->
+    <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end space-y-3 pointer-events-auto">
+        
+        <!-- Minimap Display -->
+        <div class="hidden sm:block w-36 h-24 bg-darkbg/90 border border-matline rounded-xl overflow-hidden shadow-2xl relative p-1">
+            <div id="minimap-world" class="w-full h-full cutting-mat-grid rounded relative overflow-hidden">
+                <div id="minimap-viewport" class="absolute border-2 border-peach bg-peach/15 rounded pointer-events-none transition-all duration-75"></div>
+            </div>
+            <div class="absolute bottom-1 right-2 text-[8px] font-mono text-mattext uppercase">MAT MAP</div>
         </div>
 
-        <div class="relative group">
+        <!-- Zoom Bar -->
+        <div class="flex items-center space-x-1 bg-darkbg/90 backdrop-blur-md border border-matline rounded-2xl p-1.5 shadow-2xl">
+            <button onclick="zoomCanvas(1.2)" class="w-8 h-8 rounded-xl bg-cardbg hover:bg-matline/60 text-white flex items-center justify-center font-mono text-base font-bold transition-colors">
+                +
+            </button>
+            <button onclick="zoomCanvas(0.8)" class="w-8 h-8 rounded-xl bg-cardbg hover:bg-matline/60 text-white flex items-center justify-center font-mono text-base font-bold transition-colors">
+                -
+            </button>
+            <button onclick="resetView()" title="Center Workspace" class="px-2.5 h-8 rounded-xl bg-cardbg hover:bg-matline/60 text-peach flex items-center justify-center font-mono text-xs font-bold transition-colors">
+                RESET
+            </button>
+        </div>
+    </div>
+
+    <!-- FLOATING GUIDANCE TOAST (Bottom Left) -->
+    <div class="fixed bottom-6 left-6 z-40 hidden sm:flex items-center space-x-3 bg-darkbg/90 backdrop-blur-md border border-matline/80 px-4 py-2.5 rounded-2xl shadow-2xl text-xs font-mono text-gray-300">
+        <span class="w-2 h-2 rounded-full bg-peach animate-pulse"></span>
+        <span>Drag canvas to pan • Scroll to zoom • Click project to inspect</span>
+    </div>
+
+
+    <!-- ==================================================== -->
+    <!-- CENTER PROJECT DETAIL MODAL                          -->
+    <!-- ==================================================== -->
+    <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div id="modal-box" class="relative w-full max-w-3xl max-h-[90vh] bg-cardbg border border-matline rounded-3xl shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-all duration-300">
             
-            <div class="relative bg-cardbg border border-gray-800 rounded-2xl p-8 md:p-10 shadow-2xl">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                    <div>
-                        <h3 class="text-2xl md:text-3xl font-black text-white tracking-tight">University of Western Australia</h3>
-                        <p class="text-accentpink font-mono text-sm mt-1 uppercase tracking-[0.2em]">Expected Completion: Nov 2027</p>
-                    </div>
-                    <div class="mt-4 md:mt-0 text-left md:text-right">
-                        <div class="text-4xl font-black text-peach tracking-tighter">6.30 <span class="text-sm font-normal text-gray-500 tracking-normal uppercase">GPA</span></div>
-                    </div>
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-darkbg/60">
+                <div class="flex items-center space-x-3">
+                    <span id="modal-badge" class="px-3 py-1 rounded-full bg-peach/20 text-peach border border-peach/30 font-mono text-xs font-bold uppercase">
+                        CATEGORY
+                    </span>
+                    <span class="text-xs font-mono text-gray-500 uppercase tracking-widest">CASE STUDY DETAIL</span>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-800 pt-8">
-                    <div>
-                        <h4 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Primary Degree</h4>
-                        <p class="text-xl text-white font-semibold leading-snug">
-                            Bachelor of Engineering (Honours)
-                        </p>
-                        <p class="text-peach mt-1">Automation and Robotics</p>
-                    </div>
-                    <div>
-                        <h4 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Double Major</h4>
-                        <p class="text-xl text-white font-semibold leading-snug">
-                            Bachelor of Science
-                        </p>
-                        <p class="text-peach mt-1">Computer Science</p>
-                    </div>
-                </div>
-
-                <div class="mt-10 pt-6 border-t border-gray-800/50">
-                    <p class="text-[10px] uppercase tracking-[0.3em] text-gray-600 mb-4">Core Competencies</p>
-                    <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-400 font-mono">
-                        <span>Control Theory</span>
-                        <span>Embedded Systems</span>
-                        <span>Data Structures</span>
-                        <span>Robotic Kinematics</span>
-                        <span>Systems Design</span>
-                    </div>
-                </div>
+                <button onclick="closeProjectModal()" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-peach hover:text-darkbg text-gray-400 flex items-center justify-center transition-colors font-bold text-lg">
+                    ✕
+                </button>
             </div>
-        </div>
-    </section>
 
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar space-y-6">
+                
+                <!-- Main Header Title -->
+                <div>
+                    <h2 id="modal-title" class="text-3xl md:text-5xl font-black text-white tracking-tight">Project Title</h2>
+                    <div class="h-1 w-20 bg-gradient-to-r from-peach to-accentpink rounded-full mt-3"></div>
+                </div>
+
+                <!-- Main Project Image -->
+                <div class="rounded-2xl overflow-hidden border border-gray-800 bg-black/50 aspect-video relative">
+                    <img id="modal-image" src="" alt="Project Preview" class="w-full h-full object-cover">
+                </div>
+
+                <!-- Detailed Overview -->
+                <div>
+                    <h3 class="text-xs font-mono text-peach uppercase tracking-widest mb-2 font-bold">Project Overview</h3>
+                    <div id="modal-overview" class="text-gray-300 text-base md:text-lg leading-relaxed space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Two Column Tech & Outcomes -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <!-- Tech Stack -->
+                    <div class="bg-darkbg/80 border border-gray-800 p-5 rounded-2xl">
+                        <h4 class="text-xs font-mono font-bold text-gray-400 uppercase tracking-widest mb-3">Technologies Used</h4>
+                        <div id="modal-tech" class="flex flex-wrap gap-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Outcomes -->
+                    <div class="bg-darkbg/80 border border-gray-800 p-5 rounded-2xl">
+                        <h4 class="text-xs font-mono font-bold text-gray-400 uppercase tracking-widest mb-3">Key Outcomes & Highlights</h4>
+                        <ul id="modal-outcomes" class="space-y-2 text-sm text-gray-300">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 px-6 border-t border-gray-800 bg-darkbg/80 flex flex-wrap items-center justify-between gap-4">
+                <a id="modal-link" href="#" class="px-6 py-2.5 bg-peach hover:bg-white text-darkbg font-bold rounded-xl transition-all flex items-center space-x-2 text-sm">
+                    <span>Explore Full Case Study Page</span>
+                    <span>→</span>
+                </a>
+                <button onclick="closeProjectModal()" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-sm transition-colors font-medium">
+                    Close Window
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================================================== -->
+    <!-- INTERACTIVE CANVAS & MODAL LOGIC SCRIPT              -->
+    <!-- ==================================================== -->
     <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.replace('block', 'hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('text-accentpink', 'border-accentpink');
-                b.classList.add('text-gray-400', 'border-transparent');
+        // PROJECT DATABASE WITH FULL CASE STUDY DETAILS
+        const PROJECTS_DATA = {
+            'sumo': {
+                title: 'Sumo Battle Bot',
+                badge: 'Robotics • Competition',
+                image: 'src/images/sumoBot.jpg',
+                link: 'src/projects/sumo/',
+                overview: [
+                    'Using an ESP32 as the base microcontroller, our team of 4 engineered an autonomous sumo battle bot that secured 2nd place in a high-stakes 50-team double-elimination tournament at UWA.',
+                    'We developed integrated control strategies including PID feedback loops for precise motor synchronization and a Bang-bang controller for fast target acquisition under 100ms. Iterative 3D printing and CAD modeling ensured optimal weight distribution and high-friction traction.'
+                ],
+                tech: ['ESP32', 'C++', 'PID Control', 'Autodesk Fusion', '3D Printing', 'Bang-Bang Control'],
+                outcomes: [
+                    '2nd Place overall out of 50 competing engineering teams',
+                    'Sub-100ms Target Acquisition using custom infrared / ultrasonic sensors',
+                    'Iterative CAD & 3D-printed chassis with traction optimization'
+                ]
+            },
+            'camera': {
+                title: 'Hybrid Digital Camera',
+                badge: 'Embedded • Hardware',
+                image: 'src/images/camera.jpg',
+                link: 'src/projects/camera/',
+                overview: [
+                    'Engineered a custom digital camera system combining a Raspberry Pi for high-level image processing with an Arduino Nano dedicated to peripheral control and low-latency interaction.',
+                    'This dual-controller architecture cleanly separates the high-bandwidth camera sensor pipeline from the responsive user interface. The two microcontrollers sync via a lightweight custom serial communication protocol to drive an OLED viewfinder and capture controls.'
+                ],
+                tech: ['Raspberry Pi', 'Arduino Nano', 'Python', 'C++', 'Serial Protocol', 'OLED Display'],
+                outcomes: [
+                    'Low-latency digital viewfinder and instant tactile trigger response',
+                    'Custom hardware housing and integrated optical system',
+                    'Efficient multi-controller serial bus protocol'
+                ]
+            },
+            'virtualpet': {
+                title: 'Arduino Virtual Pet',
+                badge: 'Embedded • C++',
+                image: 'src/images/pet.jpg',
+                link: 'src/projects/virtualpet/',
+                overview: [
+                    'An exploration into embedded microcontrollers and object-oriented C++, recreating the classic 90s Tamagotchi experience on an Arduino.',
+                    'The virtual pet operates on a real-time state machine balancing Hunger, Hygiene, and Fitness variables. User interactions through tactile buttons alter emotional states, rendering custom bitmap facial expressions on an OLED screen with active audio buzzer cues.'
+                ],
+                tech: ['Arduino IDE', 'C++ / OOP', 'OLED Display', 'Bitmap Rendering', 'State Machine Logic'],
+                outcomes: [
+                    'Multi-variable state machine logic running real-time decay cycles',
+                    'Custom graphics asset pipeline converting bitmaps to byte arrays',
+                    'Active audio notification system and tactile menu controls'
+                ]
+            },
+            'warman': {
+                title: '39th Warman Competition Robot',
+                badge: 'Mechatronics • Robotics',
+                image: 'src/images/warman.jpg',
+                link: 'src/projects/warman/',
+                overview: [
+                    'Participated in the prestigious Warman Engineering Competition, designing and fabricating an autonomous mechatronic robot capable of traversing complex obstacle terrain to collect and deposit items.',
+                    'The core mechanical innovation was a custom rack-and-pinion dual actuator assembly that allowed the robot to reach out over double its baseline length to collect objects across elevation changes.'
+                ],
+                tech: ['Arduino Mega', 'Mechatronics', 'Rack & Pinion', 'CAD Design', 'Motor Controllers'],
+                outcomes: [
+                    '1m vertical displacement reach with stability guarantees',
+                    'Precision collection and deposition mechatronics mechanism',
+                    'Integrated multi-actuator motion control'
+                ]
+            },
+            'mythos': {
+                title: 'MythosCraft Framework',
+                badge: 'Software • Java',
+                image: 'src/images/mythos.png',
+                link: 'src/projects/mythoscraft/',
+                overview: [
+                    'Led and collaborated with a team of programmers to architect a modular custom Java plugin framework for a large-scale Minecraft multiplayer server.',
+                    'Engineered the core architecture using Java and Maven, establishing automated release workflows via GitHub. The framework allowed modular content plugins to load dynamically while maintaining optimal server performance.'
+                ],
+                tech: ['Java', 'Maven', 'GitHub', 'IntelliJ IDEA', 'Software Architecture'],
+                outcomes: [
+                    'Modular, extensible plugin architecture for high-concurrency server',
+                    'Multi-developer repository management and CI/CD versioning',
+                    'Active community deployment supporting hundreds of concurrent users'
+                ]
+            },
+            'cfc': {
+                title: 'Coders For Cause (UWA Game Dev)',
+                badge: 'Software • Web',
+                image: 'src/images/cfc.png',
+                link: 'src/projects/cfc/',
+                overview: [
+                    'Worked alongside the Coders For Cause team to design and deploy the official web portal for the UWA Game Development Club using Agile team workflows.',
+                    'Specifically developed the embedded browser game player components, enabling interactive game demos to run seamlessly inside styled Tailwind CSS interfaces.'
+                ],
+                tech: ['JavaScript', 'Tailwind CSS', 'Agile Workflow', 'HTML5 Canvas', 'UI/UX Design'],
+                outcomes: [
+                    'Direct browser game engine integration with custom iframe/canvas wrappers',
+                    'Responsive styled component library built with Tailwind',
+                    'Collaborative Agile sprint execution'
+                ]
+            },
+            'worm': {
+                title: 'Physics Platformer Game',
+                badge: 'Software • Game Dev',
+                image: 'src/images/worm.png',
+                link: 'src/projects/worm/',
+                overview: [
+                    'Created and independently developed a physics-driven platformer video game from core mathematical mechanics to commercial release.',
+                    'Engineered custom impulse physics, presented the game at local games exhibitions to collect player telemetry, and executed a full release cycle on digital storefronts.'
+                ],
+                tech: ['Godot Engine', 'Game Engines', 'Physics Systems', 'GDScript / C#', 'Level Design'],
+                outcomes: [
+                    'Complete commercial software release cycle from prototype to launch',
+                    'Public exhibition showings at local developer showcases',
+                    'Novel physics locomotion mechanics and procedural response'
+                ]
+            }
+        };
+
+        // CANVAS STATE & PAN/ZOOM ENGINE
+        const container = document.getElementById('canvas-container');
+        const world = document.getElementById('canvas-world');
+        const minimapViewport = document.getElementById('minimap-viewport');
+
+        let transform = {
+            x: 0,
+            y: 0,
+            scale: 0.65
+        };
+
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let initialTransformX = 0;
+        let initialTransformY = 0;
+        let dragDistance = 0;
+
+        // Apply matrix transform to world
+        function updateTransform() {
+            // Clamp zoom scale between 0.35x and 1.8x
+            transform.scale = Math.min(Math.max(transform.scale, 0.35), 1.8);
+            
+            world.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
+            updateMinimap();
+        }
+
+        // Minimap Indicator updates
+        function updateMinimap() {
+            if (!minimapViewport) return;
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+            const worldW = 2280;
+            const worldH = 1580;
+
+            const mapW = 144;
+            const mapH = 96;
+
+            const vpW = Math.min((containerW / (worldW * transform.scale)) * mapW, mapW);
+            const vpH = Math.min((containerH / (worldH * transform.scale)) * mapH, mapH);
+
+            const vpX = Math.max(0, Math.min((-transform.x / (worldW * transform.scale)) * mapW, mapW - vpW));
+            const vpY = Math.max(0, Math.min((-transform.y / (worldH * transform.scale)) * mapH, mapH - vpH));
+
+            minimapViewport.style.width = `${vpW}px`;
+            minimapViewport.style.height = `${vpH}px`;
+            minimapViewport.style.left = `${vpX}px`;
+            minimapViewport.style.top = `${vpY}px`;
+        }
+
+        // CENTER OR RESET VIEW PERFECTLY AROUND ALL CARDS
+        function resetView() {
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+            
+            const targetW = 1960;
+            const targetH = 1380;
+            const scaleX = (containerW - 80) / targetW;
+            const scaleY = (containerH - 120) / targetH;
+            
+            const optimalScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.4), 0.82);
+            transform.scale = optimalScale;
+            
+            // Center of content cluster is at X = 1140, Y = 795
+            const contentCenterX = 1140;
+            const contentCenterY = 795;
+            
+            transform.x = (containerW / 2) - (contentCenterX * transform.scale);
+            transform.y = (containerH / 2) - (contentCenterY * transform.scale);
+            
+            updateTransform();
+        }
+
+        // ZOOM IN / OUT
+        function zoomCanvas(factor) {
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+            const centerX = containerW / 2;
+            const centerY = containerH / 2;
+
+            const newScale = transform.scale * factor;
+            transform.x = centerX - (centerX - transform.x) * (newScale / transform.scale);
+            transform.y = centerY - (centerY - transform.y) * (newScale / transform.scale);
+            transform.scale = newScale;
+            updateTransform();
+        }
+
+        // FOCUS SPECIFIC TARGET STATION ON CUTTING MAT
+        function focusTarget(targetId) {
+            let el = document.getElementById('target-' + targetId);
+            if (!el) {
+                if (targetId === 'projects') el = document.querySelector('.category-robotics');
+            }
+            if (!el) return;
+
+            const left = parseFloat(el.style.left) || 200;
+            const top = parseFloat(el.style.top) || 140;
+            const width = el.offsetWidth || 350;
+            const height = el.offsetHeight || 300;
+
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+
+            transform.scale = containerW < 768 ? 0.65 : 0.9;
+            transform.x = (containerW / 2) - ((left + width / 2) * transform.scale);
+            transform.y = (containerH / 2) - ((top + height / 2) * transform.scale);
+            updateTransform();
+        }
+
+        // CATEGORY FILTERING
+        function filterCategory(cat) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('border-peach', 'text-peach', 'bg-peach/10', 'font-bold');
+                btn.classList.add('border-gray-700', 'text-gray-400');
             });
 
-            document.getElementById('content-' + tabId).classList.replace('hidden', 'block');
-            const activeTab = document.getElementById('tab-' + tabId);
-            activeTab.classList.add('text-accentpink', 'border-accentpink');
-            activeTab.classList.remove('text-gray-400', 'border-transparent');
+            const activeBtn = document.getElementById('filter-' + cat);
+            if (activeBtn) {
+                activeBtn.classList.add('border-peach', 'text-peach', 'bg-peach/10', 'font-bold');
+                activeBtn.classList.remove('border-gray-700', 'text-gray-400');
+            }
+
+            const cards = document.querySelectorAll('.project-card');
+            cards.forEach(card => {
+                if (cat === 'all') {
+                    card.classList.remove('dimmed');
+                } else if (card.classList.contains('category-' + cat)) {
+                    card.classList.remove('dimmed');
+                } else {
+                    card.classList.add('dimmed');
+                }
+            });
         }
+
+        // DRAG EVENT HANDLERS (MOUSE & TOUCH)
+        container.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialTransformX = transform.x;
+            initialTransformY = transform.y;
+            dragDistance = 0;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            dragDistance += Math.abs(dx) + Math.abs(dy);
+            transform.x = initialTransformX + dx;
+            transform.y = initialTransformY + dy;
+            updateTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // WHEEL ZOOM
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+            
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const newScale = transform.scale * zoomFactor;
+            
+            transform.x = mouseX - (mouseX - transform.x) * (newScale / transform.scale);
+            transform.y = mouseY - (mouseY - transform.y) * (newScale / transform.scale);
+            transform.scale = newScale;
+            
+            updateTransform();
+        }, { passive: false });
+
+        // TOUCH DRAG FOR MOBILE
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                initialTransformX = transform.x;
+                initialTransformY = transform.y;
+                dragDistance = 0;
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            const dx = e.touches[0].clientX - startX;
+            const dy = e.touches[0].clientY - startY;
+            dragDistance += Math.abs(dx) + Math.abs(dy);
+            transform.x = initialTransformX + dx;
+            transform.y = initialTransformY + dy;
+            updateTransform();
+        });
+
+        container.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // KEYBOARD ARROW PAN
+        window.addEventListener('keydown', (e) => {
+            const step = 50;
+            if (e.key === 'ArrowLeft') { transform.x += step; updateTransform(); }
+            if (e.key === 'ArrowRight') { transform.x -= step; updateTransform(); }
+            if (e.key === 'ArrowUp') { transform.y += step; updateTransform(); }
+            if (e.key === 'ArrowDown') { transform.y -= step; updateTransform(); }
+            if (e.key === 'Escape') { closeProjectModal(); }
+        });
+
+
+        // ==================================================== -->
+        // PROJECT DETAIL MODAL CONTROLLER                      -->
+        // ==================================================== -->
+        const modal = document.getElementById('project-modal');
+        const modalBox = document.getElementById('modal-box');
+
+        function openProjectModal(projectId) {
+            if (dragDistance > 15) return;
+
+            const data = PROJECTS_DATA[projectId];
+            if (!data) return;
+
+            document.getElementById('modal-badge').innerText = data.badge;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-image').src = data.image;
+            document.getElementById('modal-image').alt = data.title;
+            document.getElementById('modal-link').href = data.link;
+
+            // Overview Paragraphs
+            const overviewContainer = document.getElementById('modal-overview');
+            overviewContainer.innerHTML = '';
+            data.overview.forEach(pText => {
+                const p = document.createElement('p');
+                p.innerText = pText;
+                overviewContainer.appendChild(p);
+            });
+
+            // Tech Stack Badges
+            const techContainer = document.getElementById('modal-tech');
+            techContainer.innerHTML = '';
+            data.tech.forEach(t => {
+                const span = document.createElement('span');
+                span.className = 'px-3 py-1 bg-cardbg border border-peach/30 rounded-lg text-xs text-peach font-mono';
+                span.innerText = t;
+                techContainer.appendChild(span);
+            });
+
+            // Outcomes List
+            const outcomesContainer = document.getElementById('modal-outcomes');
+            outcomesContainer.innerHTML = '';
+            data.outcomes.forEach(oText => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start';
+                li.innerHTML = `<span class="text-accentpink mr-2 font-bold">●</span> <span>${oText}</span>`;
+                outcomesContainer.appendChild(li);
+            });
+
+            // Show Modal
+            modal.classList.remove('pointer-events-none', 'opacity-0');
+            modalBox.classList.remove('scale-95');
+            modalBox.classList.add('scale-100');
+        }
+
+        function closeProjectModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalBox.classList.remove('scale-100');
+            modalBox.classList.add('scale-95');
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeProjectModal();
+            }
+        });
+
+        // INIT ON LOAD
+        window.addEventListener('load', () => {
+            resetView();
+        });
+        window.addEventListener('resize', () => {
+            resetView();
+        });
     </script>
-    
-    <section id="contact" class="max-w-6xl mx-auto px-4 py-24">
-        <div class="flex items-center justify-between mb-12">
-            <h2 class="text-3xl font-bold text-peach tracking-tighter uppercase">Get In Touch</h2>
-            <div class="h-px flex-grow ml-8 bg-gray-800"></div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div class="space-y-8">
-                <p class="text-xl text-gray-300 leading-relaxed">
-                    I'm currently looking for <span class="text-white font-bold">internship and graduate opportunities</span> in Robotics and Automation for late 2026/2027. If you're working on something interesting, let's connect.
-                </p>
-                
-                <div class="space-y-4">
-                    <a href="mailto:toby.collier@uwa.edu.au" class="group flex items-center space-x-4 text-gray-400 hover:text-peach transition-colors">
-                        <div class="p-3 bg-cardbg border border-gray-800 rounded-lg group-hover:border-peach">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <span class="font-mono tracking-tight">toby.collier@uwa.edu.au</span>
-                    </a>
-
-                    <a href="https://linkedin.com/in/tobiascollier" target="_blank" class="group flex items-center space-x-4 text-gray-400 hover:text-peach transition-colors">
-                        <div class="p-3 bg-cardbg border border-gray-800 rounded-lg group-hover:border-peach">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                            </svg>
-                        </div>
-                        <span class="font-mono tracking-tight">linkedin.com/in/tobiascollier</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-cardbg border border-gray-800 p-8 rounded-2xl relative overflow-hidden group">
-                <div class="absolute top-4 right-4 text-[60px] font-black text-white/5 select-none pointer-events-none">PERTH</div>
-                
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Current Availability</h3>
-                <div class="space-y-6">
-                    <div>
-                        <span class="text-peach text-xs font-mono block mb-1">LOCATION</span>
-                        <span class="text-white text-lg">Perth, Western Australia</span>
-                    </div>
-                    <div>
-                        <span class="text-peach text-xs font-mono block mb-1">ROLE STATUS</span>
-                        <div class="flex items-center">
-                            <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
-                            <span class="text-white text-lg">Seeking Engineering Internships</span>
-                        </div>
-                    </div>
-                    <a href="assets/TobiasCollierResume.pdf" class="inline-block mt-4 px-6 py-3 bg-white text-darkbg font-bold rounded-lg hover:bg-peach transition-all transform hover:-translate-y-1">
-                        Download PDF Resume
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="border-t border-gray-900 bg-darkbg py-8 mt-20">
-    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex items-center space-x-4 text-[10px] font-mono tracking-widest uppercase">
-            <div class="flex items-center">
-                <span class="relative flex h-2 w-2 mr-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-peach opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-peach"></span>
-                </span>
-                <span class="text-gray-400">System: </span>
-                <span class="text-white ml-1">Operational</span>
-            </div>
-            <div class="hidden md:block text-gray-800">|</div>
-            <div class="text-gray-400">Lat: <span class="text-white">-32.05</span></div>
-            <div class="text-gray-400">Long: <span class="text-white">115.74</span></div>
-        </div>
-        
-        <p class="text-gray-600 text-xs font-mono tracking-tighter">
-            &copy; 2026 TOBIAS COLLIER
-        </p>
-    </div>
-    </footer>
 </body>
 </html>
