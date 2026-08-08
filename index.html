@@ -129,9 +129,6 @@
                 <button onclick="focusTarget('profile')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
                     <span>👤</span> About
                 </button>
-                <button onclick="focusTarget('projects')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
-                    <span>⚙️</span> Projects
-                </button>
                 <button onclick="focusTarget('tech')" class="px-3 py-1.5 rounded-full hover:bg-matline/60 text-gray-300 hover:text-white transition-all flex items-center gap-1.5">
                     <span>💻</span> Tech Stack
                 </button>
@@ -903,15 +900,17 @@
         }
 
         // ZOOM IN / OUT
-        function zoomCanvas(factor) {
+        function zoomCanvas(factor, centerX, centerY) {
             const containerW = container.clientWidth;
             const containerH = container.clientHeight;
-            const centerX = containerW / 2;
-            const centerY = containerH / 2;
+            const cx = (centerX !== undefined) ? centerX : containerW / 2;
+            const cy = (centerY !== undefined) ? centerY : containerH / 2;
 
-            const newScale = transform.scale * factor;
-            transform.x = centerX - (centerX - transform.x) * (newScale / transform.scale);
-            transform.y = centerY - (centerY - transform.y) * (newScale / transform.scale);
+            // Clamp BEFORE computing position so the view stays anchored
+            const newScale = Math.min(Math.max(transform.scale * factor, 0.35), 1.8);
+            const ratio = newScale / transform.scale;
+            transform.x = cx - (cx - transform.x) * ratio;
+            transform.y = cy - (cy - transform.y) * ratio;
             transform.scale = newScale;
             updateTransform();
         }
@@ -988,22 +987,16 @@
             isDragging = false;
         });
 
-        // WHEEL ZOOM
+        // WHEEL ZOOM (smooth, anchored to cursor)
         container.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-            
             const rect = container.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
 
-            const newScale = transform.scale * zoomFactor;
-            
-            transform.x = mouseX - (mouseX - transform.x) * (newScale / transform.scale);
-            transform.y = mouseY - (mouseY - transform.y) * (newScale / transform.scale);
-            transform.scale = newScale;
-            
-            updateTransform();
+            // Exponential factor: smooth for trackpads, consistent for mouse notches
+            const zoomFactor = Math.pow(1.0015, -e.deltaY);
+            zoomCanvas(zoomFactor, mouseX, mouseY);
         }, { passive: false });
 
         // TOUCH DRAG FOR MOBILE
